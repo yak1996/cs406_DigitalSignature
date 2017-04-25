@@ -14,11 +14,15 @@ import os
 import select
 import socket
 import sys
-
+import random
 from OpenSSL import SSL, crypto
 from cryptography.hazmat.primitives import hashes
-
+from cryptography.hazmat.backends import default_backend
+import hashlib
 from cryptography.hazmat.primitives.asymmetric import padding
+
+
+
 
 
 
@@ -48,6 +52,38 @@ ctx.use_privatekey_file(os.path.join(dir, 'server.pkey'))
 ctx.use_certificate_file(os.path.join(dir, 'server.cert'))
 ctx.load_verify_locations(os.path.join(dir, 'CA.cert'))
 
+
+#setting up digital signature field KeyGen
+q=1299827
+t=random.randint(0,8)
+r1=pow(2,21+t)
+r2=pow(2,22+t)
+p1=random.randint(r1+1,r2-1)
+rem=p1%q
+p=(p1-rem)+1
+h=random.randint(2,p-2)
+g=1
+while (g==1):
+    h=random.randint(2,p-2)
+    g=1
+    mod=2%p
+    i=1
+    while i<=(p-1)/q:
+        g=(g*mod)%p
+        i=i+1
+
+
+x=random.randint(1,q-1)
+x_send=1
+mod=g%p
+i=1
+while i<=x:
+    x_send=(x_send*mod)%p
+    i=i+1
+
+send_str=str(q)+','+str(p)+','+str(g)+','+str(x_send)+','+str(x)
+print('done')
+
 # Set up server
 server = SSL.Connection(ctx, socket.socket(socket.AF_INET, socket.SOCK_STREAM))
 server.bind(('', int(sys.argv[1])))
@@ -63,6 +99,7 @@ pad=padding.OAEP(
          algorithm=hashes.SHA1(),
          label=None
      )
+
 
 def dropClient(cli, errors=None):
     if errors:
@@ -92,6 +129,8 @@ while 1:
             print('Connection from %s' % (addr,))
             clients[cli] = addr
             first[cli] = 0
+            cli.send(send_str)
+
 
         else:
             try:
@@ -106,7 +145,38 @@ while 1:
                 else:
                     ret = cli.recv(1024).decode('utf-8')
                     enc=pkeys[cli].encrypt(str(ret),pad)
-                    ret = enc
+                    k=random.randint(1,q-1)
+                    print("k")
+                    print(k)
+                    r=0
+                    while(r==0):
+                        r=1
+                        mod=g%p
+                        i=1
+                        while i<=k:
+                            r=(r*mod)%p
+                            i=i+1
+                        r=r%q
+                    print("r")
+                    print(r)
+                    digest = hashes.Hash(hashes.SHA256(), backend=default_backend())
+                    digest.update(enc)
+                    t=digest.finalize()
+                    val=int(t.encode('hex'),16)
+                    print('val')
+                    print(val)
+                    val=(val+x*r)%q
+                    
+                    s=1
+                    mod=k%q
+                    i=1
+                    while i<=q-2:
+                        s=(s*mod)%q
+                        i=i+1
+                    s=(s*val)%q
+                    print("s")
+                    print(s)
+                    ret = enc +','+str(r)+','+str(s)
 
             except (SSL.WantReadError,
                     SSL.WantWriteError,
