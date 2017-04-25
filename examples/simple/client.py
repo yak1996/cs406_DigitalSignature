@@ -63,7 +63,7 @@ g=int(basic_list[2])
 x_send=int(basic_list[3])
 x=int(basic_list[4])
 print("basics")
-print(q)
+print(x_send)
 
 key=crypto.PKey()
 key.generate_key(crypto.TYPE_RSA, 1024)

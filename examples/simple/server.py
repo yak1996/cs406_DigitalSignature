@@ -54,13 +54,14 @@ ctx.load_verify_locations(os.path.join(dir, 'CA.cert'))
 
 
 #setting up digital signature field KeyGen
-q=1299827
+q=5
 t=random.randint(0,8)
 r1=pow(2,21+t)
 r2=pow(2,22+t)
 p1=random.randint(r1+1,r2-1)
 rem=p1%q
 p=(p1-rem)+1
+p=31
 h=random.randint(2,p-2)
 g=1
 while (g==1):
@@ -75,11 +76,25 @@ while (g==1):
 
 x=random.randint(1,q-1)
 x_send=1
+
 mod=g%p
 i=1
 while i<=x:
     x_send=(x_send*mod)%p
     i=i+1
+print(g)
+print(x)
+print(x_send)
+print(p)
+print(q)
+
+gmp=1
+mod=g%p
+i=1
+while i<=q:
+    gmp=(gmp*mod)%p
+    i=i+1
+print(gmp)
 
 send_str=str(q)+','+str(p)+','+str(g)+','+str(x_send)+','+str(x)
 print('done')
