@@ -1,3 +1,7 @@
-To use this example, first generate keys and certificates for both the
-client and the server.  You can do this with the script in the directory
-above this one, mk_simple_certs.py.
+To run the server:
+python server.py [Port number]
+
+to run Client:
+python client.py [Server Ip address] [Server port}
+
+To incorporate an adversial action , the server itself signs the message wrongly 10 % of the times 

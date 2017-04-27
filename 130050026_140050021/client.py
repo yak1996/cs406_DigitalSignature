@@ -101,6 +101,8 @@ while 1:
                 break
             i=i-1
         enc=ret[0:index2]
+        text= tmp.decrypt(enc,pad)
+        
 
         '''
         r=int(ret[index2+1:index1])
@@ -232,7 +234,7 @@ while 1:
         v2=b
         v=(v1*v2)%p
         digest = hashes.Hash(hashes.SHA256(), backend=default_backend())
-        digest.update(enc)
+        digest.update(text)
         digest.update(str(v))
         t=digest.finalize()
         val=int(t.encode('hex'),16)
@@ -240,7 +242,6 @@ while 1:
             print ("Invalid Signature")
             continue
         
-        text= tmp.decrypt(enc,pad)
         print("message received from the server")
         sys.stdout.write(text)
         sys.stdout.flush()

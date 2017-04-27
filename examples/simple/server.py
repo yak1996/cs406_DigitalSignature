@@ -51,9 +51,11 @@ if dir == '':
 ctx = SSL.Context(SSL.SSLv23_METHOD)
 ctx.set_options(SSL.OP_NO_SSLv2)
 ctx.set_options(SSL.OP_NO_SSLv3)
+
 ctx.set_verify(
     SSL.VERIFY_PEER | SSL.VERIFY_FAIL_IF_NO_PEER_CERT, verify_cb
 )  # Demand a certificate
+
 ctx.use_privatekey_file(os.path.join(dir, 'server.pkey'))
 ctx.use_certificate_file(os.path.join(dir, 'server.cert'))
 ctx.load_verify_locations(os.path.join(dir, 'CA.cert'))
@@ -171,17 +173,31 @@ while 1:
                     #schnorr
 
                     #r=pow(g,k,p)
-                    r=1
-                    i=k
-                    a=g%p
-                    while True:
-                        t=i%2
-                        i=i/2
-                        if(t==1):
-                            r=(r*a)%p
-                        if i==0:
-                            break
-                        a=(a*a)%p
+                    t=random.randint(1,100)
+                    if(t<90):
+                        r=1
+                        i=k
+                        a=g%p
+                        while True:
+                            t=i%2
+                            i=i/2
+                            if(t==1):
+                                r=(r*a)%p
+                            if i==0:
+                                break
+                            a=(a*a)%p
+                    else:
+                        r=1
+                        i=k
+                        a=g%(p+1)
+                        while True:
+                            t=i%2
+                            i=i/2
+                            if(t==1):
+                                r=(r*a)%(p+1)
+                            if i==0:
+                                break
+                            a=(a*a)%(p+1)
                     
                     digest = hashes.Hash(hashes.SHA256(), backend=default_backend())
                     
