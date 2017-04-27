@@ -47,6 +47,7 @@ if len(sys.argv) < 2:
 dir = os.path.dirname(sys.argv[0])
 if dir == '':
     dir = os.curdir
+
 # Initialize context
 ctx = SSL.Context(SSL.SSLv23_METHOD)
 ctx.set_options(SSL.OP_NO_SSLv2)
@@ -57,6 +58,7 @@ ctx.set_verify(
 ctx.use_privatekey_file(os.path.join(dir, 'server.pkey'))
 ctx.use_certificate_file(os.path.join(dir, 'server.cert'))
 ctx.load_verify_locations(os.path.join(dir, 'CA.cert'))
+
 
 #setting up digital signature field KeyGen
 bashc="openssl dsa -in dsa_pub.pem -pubin -text -noout"

@@ -47,6 +47,7 @@ if len(sys.argv) < 2:
 dir = os.path.dirname(sys.argv[0])
 if dir == '':
     dir = os.curdir
+
 # Initialize context
 ctx = SSL.Context(SSL.SSLv23_METHOD)
 ctx.set_options(SSL.OP_NO_SSLv2)
@@ -58,11 +59,11 @@ ctx.use_privatekey_file(os.path.join(dir, 'server.pkey'))
 ctx.use_certificate_file(os.path.join(dir, 'server.cert'))
 ctx.load_verify_locations(os.path.join(dir, 'CA.cert'))
 
+
 #setting up digital signature field KeyGen
 bashc="openssl dsa -in dsa_pub.pem -pubin -text -noout"
-ashc1="openssl dsaparam 1024 < /dev/random -out dsaparam.pem "+"\n"+"openssl gendsa dsaparam.pem -out dsa_priv.pem > /dev/null 2>&1 "+"\n"+"openssl dsa -in dsa_priv.pem -pubout -out dsa_pub.pem > /dev/null 2>&1"+"\n"+"openssl dsa -in dsa_priv.pem -text -noout > key.txt"
-
-t=os.system(ashc1)
+bashc1="openssl dsaparam 1024 < /dev/random > dsaparam.pem > /dev/null 2>&1"+"\n"+"openssl gendsa dsaparam.pem -out dsa_priv.pem > /dev/null 2>&1"+"\n"+"openssl dsa -in dsa_priv.pem -pubout -out dsa_pub.pem > /dev/null 2>&1"+"\n"+"openssl dsa -in dsa_priv.pem -text -noout > key.txt"
+t=os.system(bashc1)
 f=open('key.txt','r')
 key=f.read()
 f.close()
@@ -100,7 +101,7 @@ q=int(''.join((key[index4:index41].replace(":","")).split()),16)
 g=int(''.join((key[index5:].replace(":","")).split()),16)
 
 
-send_str=str(q)+','+str(p)+','+str(g)+','+str(y)
+send_str=str(q)+','+str(p+1)+','+str(g)+','+str(y)
 print('ready to accept connections')
 
 # Set up server
